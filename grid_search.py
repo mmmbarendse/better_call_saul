@@ -24,7 +24,7 @@ class GridSearch:
         import itertools
         from distribution import gamma
         import pandas as pd
-        from crime_model import CrimeModel
+        from crime_model_02 import CrimeModel # import different model if needed
 
         param_names = list(self.parameters.keys())
         param_combinations = list(itertools.product(*[self.parameters[param] for param in param_names]))
@@ -119,11 +119,11 @@ class GridSearch:
             axs[0, 1].plot(crime_rate_over_time)
             axs[0, 1].set_title("Crime rate over time")
 
-            axs[1, 0].hist(wealth_arr_start, bins=50)
+            axs[1, 0].hist(wealth_arr_start, bins=30)
             axs[1, 0].set_title(
                 f"Wealth distribution start, Gini coefficient = {self.df_results.loc[idx, 'gini_start']:.2f}")
 
-            axs[1, 1].hist(wealth_arr_end, bins=50)
+            axs[1, 1].hist(wealth_arr_end, bins=30)
             axs[1, 1].set_title(
                 f"Wealth distribution end, Gini coefficient = {self.df_results.loc[idx, 'gini_end']:.2f}")
 
