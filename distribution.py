@@ -1,13 +1,14 @@
-def gamma(alpha, beta, N):
+def gamma(alpha, beta, N, plot=False):
     import random
     import matplotlib.pyplot as plt
 
     wealth_arr = [random.gammavariate(alpha, beta) for _ in range(N)]
-    plt.hist(wealth_arr, bins=100)
-    plt.show()
+    if plot:
+        plt.hist(wealth_arr, bins=100)
+        plt.show()
     return wealth_arr
 
-def gini(arr):
+def gini(arr, plot=False):
     import numpy as np
     import matplotlib.pyplot as plt
 
@@ -20,10 +21,11 @@ def gini(arr):
     Gini_coefficient = A / 0.5
 
     # Plotting the Lorenz curve
-    fig, ax = plt.subplots(figsize=[6, 6])
-    ax.scatter(np.arange(X_lorenz.size) / (X_lorenz.size - 1), X_lorenz, color='darkgreen', s=10)
-    ax.plot([0, 1], [0, 1], color='k')
-    ax.set_title('Lorenz curve')
-    plt.show()
+    if plot:
+        fig, ax = plt.subplots(figsize=[6, 6])
+        ax.scatter(np.arange(X_lorenz.size) / (X_lorenz.size - 1), X_lorenz, color='darkgreen', s=10)
+        ax.plot([0, 1], [0, 1], color='k')
+        ax.set_title('Lorenz curve')
+        plt.show()
 
     return Gini_coefficient
