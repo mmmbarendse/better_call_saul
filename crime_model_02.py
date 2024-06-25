@@ -8,7 +8,6 @@ class PotentialCriminal(Agent):
         super().__init__(unique_id, model)
         self.wealth = model.wealth_arr[unique_id]
         self.criminal = False
-        # self.C = 5 # poorness constant
 
     def step(self):
         if self.criminal:
@@ -16,11 +15,10 @@ class PotentialCriminal(Agent):
 
         other_agent = self.random.choice(self.model.schedule.agents)
 
-        # if min(1, 1 / self.C * self.wealth) > self.model.deterrence: # poorer agents are more likely to commit crimes
         if other_agent.wealth - self.wealth > self.model.deterrence:
             self.criminal = True
 
-            stolen_amount = self.random.gauss(*self.model.fraction_stolen) * other_agent.wealth
+            stolen_amount = max(0, self.random.gauss(*self.model.fraction_stolen) * other_agent.wealth)
             self.wealth += stolen_amount
             other_agent.wealth -= stolen_amount
 
