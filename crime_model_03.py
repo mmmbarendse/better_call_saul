@@ -15,7 +15,9 @@ class PotentialCriminal(Agent):
 
         other_agent = self.random.choice(self.model.schedule.agents)
 
-        if other_agent.wealth - self.wealth > self.model.deterrence:
+        probability_of_turning_criminal = 1 / self.wealth if self.wealth > 0 else 1
+
+        if self.random.random() + self.model.deterrence < probability_of_turning_criminal:
             self.criminal = True
 
             if other_agent.wealth > 0:
