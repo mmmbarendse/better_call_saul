@@ -10,9 +10,6 @@ class PotentialCriminal(Agent):
         self.criminal = False
 
     def step(self):
-        if self.criminal:
-            return
-
         other_agent = self.random.choice(self.model.schedule.agents)
 
         if other_agent.wealth - self.wealth > self.model.deterrence:
