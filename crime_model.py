@@ -2,7 +2,6 @@ from mesa import Model, Agent
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 
-
 class PotentialCriminal(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
@@ -16,14 +15,13 @@ class PotentialCriminal(Agent):
             self.criminal = True
 
             if other_agent.wealth > 0:
-                max_stolen_amount = min(other_agent.wealth, self.random.gauss(*self.model.fraction_stolen) * other_agent.wealth)
+                max_stolen_amount = min(other_agent.wealth, self.random.gauss(self.model.fraction_stolen) * other_agent.wealth)
                 stolen_amount = max(0, max_stolen_amount)
 
                 self.wealth += stolen_amount
                 other_agent.wealth -= stolen_amount
 
         return
-
 
 def get_crime_rate(model):
     agent_out = [agent.criminal for agent in model.schedule.agents]
@@ -37,22 +35,24 @@ def get_gini(model):
 
 class CrimeModel(Model):
     def __init__(self, N, deterrence, wealth_arr, fraction_stolen):
+        super().__init__()
+
         self.num_agents = N
         self.deterrence = deterrence
         self.wealth_arr = wealth_arr
         self.fraction_stolen = fraction_stolen
         self.schedule = RandomActivation(self)
         self.datacollector = DataCollector(
-            model_reporters={"Crime rate": get_crime_rate,
-                             "Gini Coefficient": get_gini
+            model_reporters={"crime_rate": get_crime_rate,
+                             "gini_coef": get_gini
                              },
-            agent_reporters={"Criminal": "criminal"}
+            agent_reporters={"criminal": "criminal", "wealth": "wealth"}
         )
 
         for i in range(self.num_agents):
             a = PotentialCriminal(i, self)
             self.schedule.add(a)
-
+        
     def crime_rate(self):
         return sum([a.criminal for a in self.schedule.agents]) / self.num_agents
 
