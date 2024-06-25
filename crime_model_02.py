@@ -18,7 +18,7 @@ class PotentialCriminal(Agent):
         if other_agent.wealth - self.wealth > self.model.deterrence:
             self.criminal = True
 
-            stolen_amount = min(0, self.random.gauss(*self.model.fraction_stolen) * other_agent.wealth)
+            stolen_amount = max(0, self.random.gauss(*self.model.fraction_stolen) * other_agent.wealth)
             self.wealth += stolen_amount
             other_agent.wealth -= stolen_amount
 
