@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 
+def is_fraction(num) -> bool:
+    return (num >= 0) & (num <= 1)
+
 def run_model(params: dict) -> tuple:
     """
     @params needs to contain the following variables:
@@ -23,14 +26,14 @@ def run_model(params: dict) -> tuple:
 
     wealth_arr = params['wealth_arr']
     assert all(isinstance(i, float) or isinstance(i, int) for i in wealth_arr), 'all elements in wealth_arr must be integers or floats'
-    assert all(wealth_arr >= 0) & all(wealth_arr <= 1), 'all elements in wealth_arr must be between 0 and 1'
+    assert all(is_fraction(wealth_arr)), 'all elements in wealth_arr must be between 0 and 1'
     N = len(wealth_arr)
 
     fraction_stolen = params['fraction_stolen']
-    assert (fraction_stolen >= 0) & (fraction_stolen <= 1), 'fraction_stolen must be between 0 and 1'
+    assert is_fraction(fraction_stolen), 'fraction_stolen must be between 0 and 1'
 
     deterrence = params['deterrence']
-    assert (deterrence >= 0) & (deterrence <= 1), 'deterrence must be between 0 and 1'
+    assert is_fraction(deterrence), 'deterrence must be between 0 and 1'
 
     model = CrimeModel(N, deterrence, wealth_arr, fraction_stolen)
 
@@ -42,7 +45,7 @@ def run_model(params: dict) -> tuple:
 
     return df_model, df_agent 
 
-def run_grid_search(params: dict) -> dict:
+def run_grid_search(params: dict, verbose = True) -> dict:
     import itertools
     """
     @params_dict needs to contain the following variables:
@@ -63,18 +66,20 @@ def run_grid_search(params: dict) -> dict:
     for i, combination in enumerate(param_combinations):
         param = {param_names[i]: combination[i] for i in range(len(param_names))}
         
-        # Print parameters for this run
-        print(f'Run {i+1}/{len(param_combinations)}')
-        for key in param.keys():
-            if isinstance(param[key], list) or isinstance(param[key], np.ndarray):
-                print(f'{key}: {len(param[key])} values')
-            else:
-                print(f'{key}: {param[key]}')
+        if verbose:
+            # Print parameters for this run
+            print(f'Run {i+1}/{len(param_combinations)}')
+            for key in param.keys():
+                if isinstance(param[key], list) or isinstance(param[key], np.ndarray):
+                    print(f'{key}: {len(param[key])} values')
+                else:
+                    print(f'{key}: {param[key]}')
 
         # Run model
         df_model, df_agent = run_model(param)
 
-        print(f'Done.\n')
+        if verbose:
+            print(f'Done.\n')
 
         results.append({
             "run_id":   i, 
@@ -84,3 +89,26 @@ def run_grid_search(params: dict) -> dict:
         })
 
     return results
+
+def parse_results(results : list) -> pd.DataFrame:
+
+    def get_end_gini_coef(df_model):
+        return df_model.loc[df_model.index[-1], 'gini_coef']
+
+    def get_end_crime_rate(df_model):
+        return df_model.loc[df_model.index[-1], 'crime_rate']
+
+    def parse_param(row):
+        for key, value in row['param'].items():
+            row[key] = value
+        return row
+
+    df_run = pd.DataFrame(results).set_index('run_id')
+    
+    df_run.loc[:, 'end_gini_coef'] = df_run['df_model'].apply(get_end_gini_coef)
+    df_run.loc[:, 'end_crime_rate'] = df_run['df_model'].apply(get_end_crime_rate)
+    df_run = df_run.apply(parse_param, axis=1)
+
+    df_run.drop(columns=['df_agent', 'df_model', 'wealth_arr', 'param'], inplace=True)
+
+    return df_run

@@ -1,3 +1,5 @@
+import numpy as np
+
 def gamma(alpha, beta, N, plot=False):
     import random
     import matplotlib.pyplot as plt
@@ -9,7 +11,6 @@ def gamma(alpha, beta, N, plot=False):
     return wealth_arr
 
 def gini(arr, plot=False):
-    import numpy as np
     import matplotlib.pyplot as plt
 
     X_lorenz = np.cumsum(np.sort(arr)) / np.sum(arr)
@@ -29,3 +30,7 @@ def gini(arr, plot=False):
         plt.show()
 
     return Gini_coefficient
+
+def uniform(N) -> np.array:
+    import random
+    return np.array([random.uniform(0, 1) for _ in range(N)])
