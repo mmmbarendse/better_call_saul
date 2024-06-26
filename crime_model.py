@@ -10,8 +10,8 @@ class PotentialCriminal(Agent):
         self.wealth = model.wealth_arr[unique_id]
         
     def step(self):
-        #if self.criminal:  
-        #    return
+        if self.criminal:  
+           return
 
         other_agent = self.random.choice(self.model.schedule.agents)
 

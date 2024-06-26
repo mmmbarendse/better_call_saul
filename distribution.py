@@ -2,7 +2,10 @@ def gamma(alpha, beta, N, plot=False):
     import random
     import matplotlib.pyplot as plt
 
-    wealth_arr = [random.gammavariate(alpha, beta) for _ in range(N)]
+    wealtharr = [random.gammavariate(alpha, beta) for  in range(N)]
+    sum_wealth = sum(wealth_arr)
+    wealth_arr = [i/sum_wealth for i in wealth_arr]    # normalization
+
     if plot:
         plt.hist(wealth_arr, bins=100)
         plt.show()
